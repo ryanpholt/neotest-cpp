@@ -1,0 +1,6 @@
+/.tests
+/build
+/tests/integration/cpp/.xmake/
+/tests/integration/cpp/build/
+/tests/integration/cpp/compile_commands.json
+.DS_Store

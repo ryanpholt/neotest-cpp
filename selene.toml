@@ -1,0 +1,7 @@
+std = "vim"
+
+exclude = ["**/xmake.lua"]
+
+[lints]
+mixed_table="allow"
+
