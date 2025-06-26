@@ -1,5 +1,6 @@
 local discover = require("neotest-cpp.framework.gtest.discover")
 local exe = require("neotest-cpp.framework.exe")
+local log = require("neotest-cpp.log")
 local types = require("neotest.types")
 local utils = require("neotest-cpp.utils")
 
@@ -40,6 +41,7 @@ local function start_exe_watchers(executables)
       defer = vim.defer_fn(function()
         require("nio").run(function()
           defer = nil
+          log.trace("Executable", executable("was modified"))
           local new_tests = discover.tests_from_executable(executable)
           for key, val in pairs(new_tests) do
             cached_tests_from_exe[key] = val
@@ -69,18 +71,22 @@ local function get_tests_from_executable(file_path)
     local executable_path = config.get().executables.resolve(file_path)
     if executable_path then
       assert(exe.is_executable(executable_path))
+      log.debug("Executable resolved from", file_path, ":", executable_path)
       return {
         exe.Executable:new(executable_path),
       }
     else
-      return exe.get_or_cached(config.get().executables.patterns)
+      local executables = exe.get_or_cached(config.get().executables.patterns)
+      log.debug("Executables discovered via patterns:", executables)
+      return executables
     end
   end
   local executables = get_executables()
   local tests = discover.tests_from_executables(executables)
   cached_tests_from_exe = vim.tbl_extend("force", cached_tests_from_exe, tests)
   start_exe_watchers(executables)
-  return cached_tests_from_exe[file_path]
+  local tests_in_file = cached_tests_from_exe[file_path]
+  return tests_in_file
 end
 
 --- Remove tests that don't exist on the executable
@@ -154,11 +160,7 @@ function M.build(args)
 
   if not vim.tbl_isempty(non_existent_tests) then
     vim.schedule(function()
-      vim.notify(
-        "Some tests do not exist on the executable.",
-        vim.log.levels.WARN,
-        { title = "neotest-cpp" }
-      )
+      vim.notify("Some tests do not exist on the executable.", vim.log.levels.WARN, { title = "neotest-cpp" })
     end)
   end
 
@@ -180,7 +182,11 @@ function M.build(args)
     table.insert(arguments, "--gtest_break_on_failure")
   end
 
-  return executable, arguments, { results_path = results_path, non_existent_tests = non_existent_tests }
+  local context = { results_path = results_path, non_existent_tests = non_existent_tests }
+
+  log.debug("GTest spec:", executable, arguments, context)
+
+  return executable, arguments, context
 end
 
 return M

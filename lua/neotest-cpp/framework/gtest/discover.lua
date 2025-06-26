@@ -1,3 +1,4 @@
+local log = require("neotest-cpp.log")
 local nio = require("nio")
 local test_types = require("neotest-cpp.framework.types")
 local utils = require("neotest-cpp.utils")
@@ -120,7 +121,7 @@ function M.tests_from_treesitter(file)
       table.insert(suite.tests, test)
     end
   end
-
+  log.debug("Discovered tests via treesitter for", file, ":", tests)
   return tests
 end
 
@@ -161,8 +162,9 @@ end
 function M.tests_from_executable(executable)
   ---@type table<string, TestFile>
   local tests = {}
-  local content, _ = run_gtest_list(executable)
+  local content, error = run_gtest_list(executable)
   if not content then
+    log.warn("Failed to list tests from executable", executable, ":", error)
     return {}
   end
   for _, testsuite in ipairs(content.testsuites or {}) do
@@ -178,6 +180,7 @@ function M.tests_from_executable(executable)
       end
     end
   end
+  log.debug("Discovered tests from executable", executable, ":", tests)
   return tests
 end
 

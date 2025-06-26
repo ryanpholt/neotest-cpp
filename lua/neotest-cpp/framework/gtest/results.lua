@@ -1,4 +1,5 @@
 local lib = require("neotest.lib")
+local log = require("neotest-cpp.log")
 local types = require("neotest.types")
 local utils = require("neotest-cpp.utils")
 
@@ -137,6 +138,7 @@ function M.results(spec, result)
       short = string.format("\27[1m%s.%s does not exist on executable\27[0m\n", test.suite, test.name),
     }
   end
+  log.debug("GTest results:", results)
   return results
 end
 

@@ -1,4 +1,5 @@
 local framework = require("neotest-cpp.framework")
+local log = require("neotest-cpp.log")
 local types = require("neotest.types")
 
 ---@class neotest-cpp.adapter
@@ -42,6 +43,7 @@ end
 ---@param file_path string Absolute file path
 ---@return neotest.Tree | nil
 M.discover_positions = function(file_path)
+  log.trace("Discovering positions for", file_path)
   local tests = framework.discover.tests_from_treesitter(file_path)
   ---@type neotest.Position[]
   local file_positions = {
@@ -113,6 +115,7 @@ end
 ---@param args neotest.RunArgs
 ---@return nil | neotest.RunSpec | neotest.RunSpec[]
 M.build_spec = function(args)
+  log.trace("Building spec for", args)
   local executable, arguments, context = framework.spec.build(args)
   if not executable or not arguments then
     return nil
@@ -138,6 +141,7 @@ end
 ---@param _ neotest.Tree
 ---@return table<string, neotest.Result>
 M.results = function(spec, result, _)
+  log.trace("Building results for", spec, result)
   return framework.results.results(spec, result)
 end
 

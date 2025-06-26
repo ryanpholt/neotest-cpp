@@ -6,7 +6,7 @@ describe("neotest-cpp end-to-end integration", function()
   local test_project_dir = "tests/integration/cpp"
 
   setup(function()
-    vim.system({"xmake"}, { cwd = test_project_dir }):wait()
+    vim.system({ "xmake" }, { cwd = test_project_dir }):wait()
   end)
 
   local function wait_for(func)
