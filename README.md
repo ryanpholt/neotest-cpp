@@ -1,7 +1,7 @@
 # neotest-cpp
 
 Neotest-cpp is a Neovim plugin that allows you to run and debug [GoogleTest](https://github.com/google/googletest) tests directly within Neovim.
-It is implemented as a [neotest](https://github.com/google/googletest) adapter and provides:
+It is implemented as a [neotest](https://github.com/nvim-neotest/neotest) adapter and provides:
 
 * A smooth, out-of-the-box experience for most users
 * Scalability for large monorepos with hundreds or thousands of test executables
