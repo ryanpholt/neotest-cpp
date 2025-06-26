@@ -143,7 +143,7 @@ local function run_gtest_list(executable)
     )
   end)
   if not ok then
-    return nil, string.format("Failed to list tests from executable '%s': %s", executable, res)
+    return nil, string.format("Failed to list tests from executable '%s': %s", executable.path, res)
   end
   res = future.wait()
   if res.code ~= 0 then
