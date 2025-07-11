@@ -28,6 +28,9 @@ jobs:
       with:
         xmake-version: latest
     
+    - name: Setup LuaRocks
+      uses: hishamhm/gh-actions-luarocks@master
+
     - name: Verify installations
       run: |
         nvim --version
