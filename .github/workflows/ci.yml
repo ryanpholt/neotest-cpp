@@ -37,7 +37,7 @@ jobs:
         xmake --version
     
     - name: Build C++ test project
-      run: xmake -P tests/integration/cpp
+      run: xmake -P tests/integration/cpp -y
     
     - name: Run tests
       run: |
