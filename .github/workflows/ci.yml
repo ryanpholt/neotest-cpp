@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: "*"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        neovim_version: ['stable', 'nightly']
+    
+    steps:
+    - name: Checkout repository
+    - uses: actions/checkout@v4
+    
+    - name: Setup Neovim
+      uses: rhysd/action-setup-vim@v1
+      with:
+        neovim: true
+        version: ${{ matrix.neovim_version }}
+    
+    - name: Setup xmake
+      uses: xmake-io/github-action-setup-xmake@v1
+      with:
+        xmake-version: latest
+    
+    - name: Verify installations
+      run: |
+        nvim --version
+        xmake --version
+    
+    - name: Run tests
+      run: |
+        nvim -l ./tests/busted.lua tests --verbose
