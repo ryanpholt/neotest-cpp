@@ -36,6 +36,9 @@ jobs:
         nvim --version
         xmake --version
     
+    - name: Build C++ test project
+      run: xmake -P tests/integration/cpp
+    
     - name: Run tests
       run: |
         nvim -l ./tests/busted.lua tests --verbose
