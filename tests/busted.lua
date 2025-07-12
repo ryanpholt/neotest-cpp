@@ -30,17 +30,6 @@ require("lazy.minit").busted({
     {
       "nvim-neotest/neotest",
       lazy = false,
-      config = function()
-        require("neotest").setup({
-          discovery = {
-            enabled = false,
-          },
-          log_level = vim.log.levels.DEBUG,
-          adapters = {
-            require("neotest-cpp"),
-          },
-        })
-      end,
     },
     {
       "mfussenegger/nvim-dap",

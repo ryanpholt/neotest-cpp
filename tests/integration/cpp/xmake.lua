@@ -1,6 +1,11 @@
 add_rules("mode.debug", "mode.release")
 
-add_requires("gtest", { configs = { main = true, gmock = true } })
+option("gtest_version")
+set_default("1.16.0")
+set_description("GoogleTest version to use")
+option_end()
+
+add_requires("gtest $(gtest_version)", { configs = { main = true, gmock = true } })
 
 target("your_library")
 set_kind("static")

@@ -41,7 +41,7 @@ local function start_exe_watchers(executables)
       defer = vim.defer_fn(function()
         require("nio").run(function()
           defer = nil
-          log.trace("Executable", executable("was modified"))
+          log.trace("Executable", executable, "was modified")
           local new_tests = discover.tests_from_executable(executable)
           for key, val in pairs(new_tests) do
             cached_tests_from_exe[key] = val

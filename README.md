@@ -18,6 +18,7 @@ It is implemented as a [neotest](https://github.com/nvim-neotest/neotest) adapte
 ## Requirements
 
 * Neovim v0.11.x or greater
+* GoogleTest v1.12.0 or greater
 
 ## Installation
 
