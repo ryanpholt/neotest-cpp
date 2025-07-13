@@ -1,6 +1,6 @@
 local neotest = require("neotest")
 local nio = require("nio")
-require("tests.utils")
+local utils = require("tests.utils")
 
 local function wait_for(func)
   local i = 0
@@ -27,20 +27,21 @@ describe("neotest-cpp end-to-end integration", function()
         vim.system({ "xmake", "--rebuild", "--yes" }, { cwd = test_project_dir }):wait()
       end)
 
-      local test_file
-      local buf
-
       before_each(function()
-        require("neotest").setup({
-          adapters = {
-            require("neotest-cpp"),
+        utils.setup_neotest({
+          executables = {
+            patterns = { "tests/integration/cpp/build/**" },
+            cwd = function(_)
+              return "tests/integration/cpp"
+            end,
+          },
+          gtest = {
+            test_prefixes = {
+              "RH_",
+              "XY_",
+            },
           },
         })
-        test_file = vim.fs.joinpath(test_project_dir, "test", "test_mylib.cpp")
-        buf = vim.api.nvim_create_buf(false, false)
-        vim.api.nvim_buf_set_name(buf, test_file)
-        vim.api.nvim_set_current_buf(buf)
-        vim.api.nvim_command("edit " .. test_file)
       end)
 
       after_each(function()
@@ -50,6 +51,11 @@ describe("neotest-cpp end-to-end integration", function()
       end)
 
       it("runs a single test and captures output", function()
+        local test_file = vim.fs.joinpath(test_project_dir, "test", "test_mylib.cpp")
+        local buf = vim.api.nvim_create_buf(false, false)
+        vim.api.nvim_buf_set_name(buf, test_file)
+        vim.api.nvim_set_current_buf(buf)
+        vim.api.nvim_command("edit " .. test_file)
         nio.tests.with_async_context(function()
           wait_for(function()
             local ok = pcall(neotest.run.run, vim.fn.expand("%"))

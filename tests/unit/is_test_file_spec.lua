@@ -1,4 +1,10 @@
-local adapter = require("neotest-cpp.adapter")
+local adapter
+local utils = require("tests.utils")
+
+before_each(function()
+  utils.setup_neotest({})
+  adapter = require("neotest-cpp.adapter")
+end)
 
 describe("is_test_file", function()
   it("should return true for C++ test files", function()

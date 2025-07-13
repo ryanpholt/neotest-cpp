@@ -1,13 +1,20 @@
-local adapter = require("neotest-cpp.adapter")
 local nio = require("nio")
+local utils = require("tests.utils")
 
 describe("results", function()
   local temp_results_file
+  local adapter
+
+  before_each(function()
+    utils.setup_neotest({})
+    adapter = require("neotest-cpp.adapter")
+  end)
 
   local function get_results(mock_gtest_results)
     local json_content = vim.json.encode(mock_gtest_results)
 
     local file = io.open(temp_results_file, "w")
+    assert(file)
     file:write(json_content)
     file:close()
 

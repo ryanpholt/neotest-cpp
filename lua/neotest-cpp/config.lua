@@ -91,7 +91,6 @@ local config = {}
 function M.setup(opts)
   --- @type neotest-cpp.Config
   config = vim.tbl_deep_extend("force", M.defaults, opts or {})
-  --require('neotest-cpp.log').info("Config is:", config)
 end
 
 --- @return neotest-cpp.Config

@@ -1,13 +1,12 @@
 local adapter
 local nio = require("nio")
 local types = require("neotest.types")
-require("tests.utils")
+local utils = require("tests.utils")
 
 describe("build_spec", function()
   setup(function()
     -- selene: allow(global_usage)
     _G._TEST = true
-    adapter = require("neotest-cpp.adapter")
   end)
 
   teardown(function()
@@ -15,18 +14,31 @@ describe("build_spec", function()
     _G._TEST = nil
   end)
 
+  before_each(function()
+    utils.setup_neotest({
+      executables = {
+        patterns = { "tests/integration/cpp/build/**" },
+        cwd = function(_)
+          return "tests/integration/cpp"
+        end,
+      },
+      gtest = {
+        test_prefixes = {
+          "RH_",
+          "XY_",
+        },
+      },
+    })
+    adapter = require("neotest-cpp.adapter")
+  end)
+
   local function build_spec(mock_positions, strategy)
     local mock_tree = require("neotest.types.tree").from_list(mock_positions, function(x)
       return x.id
     end)
-    local output_file = "/tmp/neotest-cpp-results"
     local args = {
       tree = mock_tree,
       strategy = strategy,
-      unit_testing = {
-        ignore_exe = true,
-        output_file = output_file,
-      },
     }
     local spec = nio.tests.with_async_context(adapter.build_spec, args)
     return vim.inspect(spec)
@@ -69,8 +81,7 @@ describe("build_spec", function()
         args = { "--gtest_filter=TestSuite.TestCase", "--gtest_output=json:/tmp/neotest-cpp-results", "--gtest_color=no",
                  "--gtest_break_on_failure" },
         cwd = "tests/integration/cpp",
-        name = "Debug with neotest-gtest",
-        preRunCommands = {},
+        name = "Debug with neotest-cpp",
         program = "/path/to/test_executable",
         request = "launch",
         type = "lldb"
@@ -138,8 +149,7 @@ describe("build_spec", function()
         args = { "--gtest_filter=TestSuite.TestCase1:TestSuite.TestCase2", "--gtest_output=json:/tmp/neotest-cpp-results", "--gtest_color=no",
                  "--gtest_break_on_failure" },
         cwd = "tests/integration/cpp",
-        name = "Debug with neotest-gtest",
-        preRunCommands = {},
+        name = "Debug with neotest-cpp",
         program = "/path/to/test_executable",
         request = "launch",
         type = "lldb"
@@ -217,8 +227,7 @@ describe("build_spec", function()
         args = { "--gtest_filter=TestSuite.TestCase1:TestSuite.TestCase2", "--gtest_output=json:/tmp/neotest-cpp-results", "--gtest_color=no",
                  "--gtest_break_on_failure" },
         cwd = "tests/integration/cpp",
-        name = "Debug with neotest-gtest",
-        preRunCommands = {},
+        name = "Debug with neotest-cpp",
         program = "/path/to/test_executable",
         request = "launch",
         type = "lldb"
@@ -286,8 +295,7 @@ describe("build_spec", function()
         args = { "--gtest_filter=ParameterizedTest/IntegrationTest.TestCase/0:ParameterizedTest/IntegrationTest.TestCase/1", "--gtest_output=json:/tmp/neotest-cpp-results", "--gtest_color=no",
                  "--gtest_break_on_failure" },
         cwd = "tests/integration/cpp",
-        name = "Debug with neotest-gtest",
-        preRunCommands = {},
+        name = "Debug with neotest-cpp",
         program = "/path/to/test_executable",
         request = "launch",
         type = "lldb"

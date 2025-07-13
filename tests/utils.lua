@@ -1,6 +1,8 @@
 local assert = require("luassert")
 local say = require("say")
 
+local M = {}
+
 -- Custom assertion function for whitespace-insensitive string comparison
 local function same_ignoring_whitespace(_, arguments)
   local actual = arguments[1]
@@ -47,3 +49,18 @@ assert:register(
   "assertion.same_ignoring_whitespace.positive",
   "assertion.same_ignoring_whitespace.negative"
 )
+
+function M.setup_neotest(neotest_cpp_config)
+  require("neotest-cpp").setup(neotest_cpp_config)
+  ---@diagnostic disable
+  require("neotest").setup({
+    adapters = {
+      require("neotest-cpp"),
+    },
+    discovery = {
+      enabled = false,
+    },
+  })
+end
+
+return M

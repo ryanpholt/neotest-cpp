@@ -1,9 +1,10 @@
-local adapter = require("neotest-cpp.adapter")
 local nio = require("nio")
-require("tests.utils")
+local utils = require("tests.utils")
 
 describe("discover_positions", function()
   local test_file_path = "/tmp/test_discover_positions.cpp"
+
+  local adapter
 
   local function discover_positions(content)
     local bufnr = vim.api.nvim_get_current_buf()
@@ -20,6 +21,16 @@ describe("discover_positions", function()
   end
 
   before_each(function()
+    utils.setup_neotest({
+      gtest = {
+        test_prefixes = {
+          "RH_",
+          "XY_",
+        },
+      },
+    })
+    adapter = require("neotest-cpp.adapter")
+
     local bufnr = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_name(bufnr, test_file_path)
     vim.bo[bufnr].filetype = "cpp"
