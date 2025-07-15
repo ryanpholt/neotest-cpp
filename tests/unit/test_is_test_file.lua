@@ -1,23 +1,39 @@
-local adapter
-local utils = require("tests.utils")
+local eq = MiniTest.expect.equality
 
-before_each(function()
-  utils.setup_neotest({})
-  adapter = require("neotest-cpp.adapter")
-end)
+local child = MiniTest.new_child_neovim()
 
-describe("is_test_file", function()
-  it("should return true for C++ test files", function()
-    assert.is_true(adapter.is_test_file("/path/to/test_file.cpp"))
-    assert.is_true(adapter.is_test_file("/path/to/file_test.cxx"))
-    assert.is_true(adapter.is_test_file("/path/to/file_test.cc"))
-  end)
+local T = MiniTest.new_set({
+  hooks = {
+    pre_case = function()
+      child.restart({ "-u", "scripts/minimal_init.lua" })
+      child.lua_func(function()
+        require("tests.helpers").setup_neotest({})
+      end)
+    end,
+    post_case = function()
+      child.stop()
+    end,
+  },
+})
 
-  it("should return false for non-C++ files", function()
-    assert.is_false(adapter.is_test_file("/path/to/file.c"))
-    assert.is_false(adapter.is_test_file("/path/to/file.h"))
-    assert.is_false(adapter.is_test_file("/path/to/file.hpp"))
-    assert.is_false(adapter.is_test_file("/path/to/file.py"))
-    assert.is_false(adapter.is_test_file("/path/to/file.txt"))
-  end)
-end)
+local is_test_file = function(path_)
+  return child.lua_func(function(path)
+    return require("neotest-cpp").is_test_file(path)
+  end, path_)
+end
+
+T["should return true for C++ test files"] = function()
+  eq(is_test_file("/path/to/test_file.cpp"), true)
+  eq(is_test_file("/path/to/file_test.cxx"), true)
+  eq(is_test_file("/path/to/file_test.cc"), true)
+end
+
+T["should return false for non-C++ files"] = function()
+  eq(is_test_file("/path/to/file.c"), false)
+  eq(is_test_file("/path/to/file.h"), false)
+  eq(is_test_file("/path/to/file.hpp"), false)
+  eq(is_test_file("/path/to/file.py"), false)
+  eq(is_test_file("/path/to/file.txt"), false)
+end
+
+return T

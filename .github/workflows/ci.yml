@@ -27,18 +27,12 @@ jobs:
       uses: xmake-io/github-action-setup-xmake@v1
       with:
         xmake-version: latest
-    
-    - name: Install dependencies
-      run: sudo apt update && sudo apt install -y libreadline-dev
 
     - name: Verify installations
       run: |
         nvim --version
         xmake --version
     
-    - name: Build C++ test project
-      run: xmake -P tests/integration/cpp -y
-    
     - name: Run tests
       run: |
-        nvim -l ./tests/busted.lua tests --verbose
+        make test
