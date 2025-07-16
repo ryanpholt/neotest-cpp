@@ -1,6 +1,7 @@
 /.tests
 /build
-/tests/integration/cpp/.xmake/
-/tests/integration/cpp/build/
-/tests/integration/cpp/compile_commands.json
+/tests/functional/cpp/.xmake/
+/tests/functional/cpp/build/
+/tests/functional/cpp/compile_commands.json
+/deps
 .DS_Store
