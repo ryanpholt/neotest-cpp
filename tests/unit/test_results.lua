@@ -31,6 +31,7 @@ local get_results = function(res)
         results_path = temp_results_file,
         non_existent_tests = {},
       },
+      cwd = vim.fn.getcwd(),
     }
 
     local result = { output = "test output" }
@@ -107,9 +108,9 @@ T["failed"] = function()
     },
   }
 
-  local expected = [[
+  local expected = string.format([[
     {
-      ["/Users/ryanholt/projects/neotest-cpp/test/test_mylib.cpp::MathTest::AddFunction3"] = {
+      ["%s/test/test_mylib.cpp::MathTest::AddFunction3"] = {
         errors = { {
             line = 14,
             message = "Expected equality of these values:\n  add(2, 3)\n    Which is: 5\n  3\n"
@@ -123,7 +124,7 @@ T["failed"] = function()
         status = "failed"
       }
     }
-  ]]
+  ]], vim.fn.getcwd())
 
   helpers.equality_sanitized(get_results(mock_gtest_results), expected)
 end
@@ -161,16 +162,16 @@ T["passed parameterized"] = function()
     },
   }
 
-  local expected = [[
+  local expected = string.format([[
     {
-      ["/Users/ryanholt/projects/neotest-cpp/test/test_mylib.cpp::MathTest::CheckEvenNumbers/*"] = {
+      ["%s/test/test_mylib.cpp::MathTest::CheckEvenNumbers/*"] = {
         errors = {},
         output = "test output",
         short = "\27[1mMathTest.CheckEvenNumbers/0 passed\27[0m\n\n\27[1mMathTest.CheckEvenNumbers/1 passed\27[0m\n",
         status = "passed"
       }
     }
-  ]]
+  ]], vim.fn.getcwd())
 
   helpers.equality_sanitized(get_results(mock_gtest_results), expected)
 end
@@ -214,19 +215,19 @@ T["failed parameterized"] = function()
     },
   }
 
-  local expected = [[
+  local expected = string.format([[
       {
-      ["/Users/ryanholt/projects/neotest-cpp/test/test_mylib.cpp::MathTest::CheckEvenNumbers/*"] = {
+      ["%s/test/test_mylib.cpp::MathTest::CheckEvenNumbers/*"] = {
         errors = { {
             line = 66,
-            message = "Expected equality of these values:\n  n % 2\n    Which is: 1\n  0\n"
+            message = "Expected equality of these values:\n  n %% 2\n    Which is: 1\n  0\n"
           } },
         output = "test output",
-        short = "\27[1mMathTest.CheckEvenNumbers/0 failed\27[0m\n\nExpected equality of these values:\n  n % 2\n    Which is: 1\n  0\n\n\27[1mMathTest.CheckEvenNumbers/1 passed\27[0m\n",
+        short = "\27[1mMathTest.CheckEvenNumbers/0 failed\27[0m\n\nExpected equality of these values:\n  n %% 2\n    Which is: 1\n  0\n\n\27[1mMathTest.CheckEvenNumbers/1 passed\27[0m\n",
         status = "failed"
       }
     }
-  ]]
+  ]], vim.fn.getcwd())
 
   helpers.equality_sanitized(get_results(mock_gtest_results), expected)
 end

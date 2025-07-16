@@ -24,7 +24,7 @@ for _, version in ipairs(gtest_versions) do
               ret = func()
               return ret ~= nil
             end
-            vim.wait(2000, wrapper, 50)
+            vim.wait(2000, wrapper, 100)
             return ret
           end
         end)
