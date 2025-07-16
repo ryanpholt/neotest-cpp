@@ -6,9 +6,9 @@ local T = MiniTest.new_set()
 
 local gtest_versions = { "1.12.0", "1.13.0", "1.15.2", "1.16.0" }
 
-for _, version in ipairs(gtest_versions) do
-  local child = MiniTest.new_child_neovim()
+local child = MiniTest.new_child_neovim()
 
+for _, version in ipairs(gtest_versions) do
   T[version] = MiniTest.new_set({
     hooks = {
       pre_once = function()
@@ -18,21 +18,6 @@ for _, version in ipairs(gtest_versions) do
       pre_case = function()
         child.restart({ "-u", "scripts/minimal_init.lua" })
         child.lua_func(function()
-          require("tests.helpers").setup_neotest({
-            executables = {
-              patterns = { "tests/functional/cpp/build/**" },
-              cwd = function(_)
-                return "tests/functional/cpp"
-              end,
-            },
-            gtest = {
-              test_prefixes = {
-                "RH_",
-                "XY_",
-              },
-            },
-            log_level = vim.log.levels.TRACE,
-          })
           function _G.wait_for(func)
             local ret
             local wrapper = function()
@@ -48,9 +33,14 @@ for _, version in ipairs(gtest_versions) do
         child.stop()
       end,
     },
+    parametrize = {
+      {"pattern"},
+      {"resolve"},
+    },
   })
 
-  T[version]["status"] = function()
+  T[version]["status"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
     local test_file = child.fs.joinpath(test_project_dir, "test", "test_mylib.cpp")
 
     local status = helpers.run_and_get_status(child, test_file)
@@ -69,7 +59,8 @@ for _, version in ipairs(gtest_versions) do
     )
   end
 
-  T[version]["diagnostics"] = function()
+  T[version]["diagnostics"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
     local test_file = child.fs.joinpath(test_project_dir, "test", "test_mylib.cpp")
 
     local diagnostics = helpers.run_and_get_diagnostics(child, test_file)
@@ -124,7 +115,8 @@ for _, version in ipairs(gtest_versions) do
     )
   end
 
-  T[version]["output panel"] = function()
+  T[version]["output panel"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
     local test_file = child.fs.joinpath(test_project_dir, "test", "test_mylib.cpp")
 
     local output = helpers.run_and_get_output_panel_contents(child, test_file)

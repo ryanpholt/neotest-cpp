@@ -12,7 +12,7 @@ M.Executable.__index = M.Executable
 function M.Executable:new(path)
   local exe = {}
   local cfg_exe = require("neotest-cpp.config").get().executables
-  exe.path = path
+  exe.path = vim.fs.abspath(path)
   exe.cwd = cfg_exe.cwd(path)
   exe.env = cfg_exe.env(path)
   exe.dap_template = cfg_exe.debug.dap_template(path)
@@ -45,8 +45,7 @@ local function get(glob_patterns)
       return M.is_executable(match)
     end)
     :map(function(match)
-      local path = vim.fs.abspath(match)
-      return M.Executable:new(path)
+      return M.Executable:new(match)
     end)
     :totable()
 end

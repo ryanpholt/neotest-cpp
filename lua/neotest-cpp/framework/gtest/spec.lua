@@ -48,7 +48,11 @@ end
 --- @return Executable[]
 local function get_executables(file_path)
   local config = require("neotest-cpp.config")
-  local executable_path = config.get().executables.resolve(file_path)
+  local future = require("nio").control.future()
+  vim.schedule(function()
+    future.set(config.get().executables.resolve(file_path))
+  end)
+  local executable_path = future:wait()
   if executable_path then
     if not exe.is_executable(executable_path) then
       log.error("Executable resolved from", file_path, ":", executable_path, "is not executable")

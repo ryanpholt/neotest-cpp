@@ -1,5 +1,37 @@
 local M = {}
 
+function M.setup_neotest(child, pattern_or_resolve_)
+  child.lua_func(function(pattern_or_resolve)
+    local patterns = nil
+    local resolve = nil
+    if pattern_or_resolve == "pattern" then
+      patterns = { "tests/functional/cpp/build/**" }
+    else
+      resolve = function(_)
+        local results = vim.fn.glob("tests/functional/cpp/build/**/tests", false, true)
+        assert(#results == 1)
+        return results[1]
+      end
+    end
+    require("tests.helpers").setup_neotest({
+      executables = {
+        patterns = patterns,
+        resolve = resolve,
+        cwd = function(_)
+          return "tests/functional/cpp"
+        end,
+      },
+      gtest = {
+        test_prefixes = {
+          "RH_",
+          "XY_",
+        },
+      },
+      log_level = vim.log.levels.TRACE,
+    })
+  end, pattern_or_resolve_)
+end
+
 local function open_buf(child, test_file)
   local buf = child.api.nvim_create_buf(false, false)
   child.api.nvim_buf_set_name(buf, test_file)
