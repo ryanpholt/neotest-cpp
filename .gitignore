@@ -1,7 +1,8 @@
 /.tests
 /build
-/tests/functional/cpp/.xmake/
+.xmake
 /tests/functional/cpp/build/
 /tests/functional/cpp/compile_commands.json
 /deps
 .DS_Store
+.cache/
