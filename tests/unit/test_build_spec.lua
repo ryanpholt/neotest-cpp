@@ -13,8 +13,8 @@ local T = MiniTest.new_set({
           executables = {
             resolve = function(_)
               return "/path/to/executable"
-            end
-          }
+            end,
+          },
         })
       end)
     end,
@@ -283,4 +283,3 @@ T["should create a valid run spec for parameterized tests"] = function()
 end
 
 return T
-

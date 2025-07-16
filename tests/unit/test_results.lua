@@ -108,7 +108,8 @@ T["failed"] = function()
     },
   }
 
-  local expected = string.format([[
+  local expected = string.format(
+    [[
     {
       ["%s/test/test_mylib.cpp::MathTest::AddFunction3"] = {
         errors = { {
@@ -124,7 +125,9 @@ T["failed"] = function()
         status = "failed"
       }
     }
-  ]], vim.fn.getcwd())
+  ]],
+    vim.fn.getcwd()
+  )
 
   helpers.equality_sanitized(get_results(mock_gtest_results), expected)
 end
@@ -162,7 +165,8 @@ T["passed parameterized"] = function()
     },
   }
 
-  local expected = string.format([[
+  local expected = string.format(
+    [[
     {
       ["%s/test/test_mylib.cpp::MathTest::CheckEvenNumbers/*"] = {
         errors = {},
@@ -171,7 +175,9 @@ T["passed parameterized"] = function()
         status = "passed"
       }
     }
-  ]], vim.fn.getcwd())
+  ]],
+    vim.fn.getcwd()
+  )
 
   helpers.equality_sanitized(get_results(mock_gtest_results), expected)
 end
@@ -215,7 +221,8 @@ T["failed parameterized"] = function()
     },
   }
 
-  local expected = string.format([[
+  local expected = string.format(
+    [[
       {
       ["%s/test/test_mylib.cpp::MathTest::CheckEvenNumbers/*"] = {
         errors = { {
@@ -227,7 +234,9 @@ T["failed parameterized"] = function()
         status = "failed"
       }
     }
-  ]], vim.fn.getcwd())
+  ]],
+    vim.fn.getcwd()
+  )
 
   helpers.equality_sanitized(get_results(mock_gtest_results), expected)
 end

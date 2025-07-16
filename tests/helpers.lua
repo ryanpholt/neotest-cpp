@@ -3,17 +3,17 @@ local M = {}
 -- Add extra expectations
 M.expect = vim.deepcopy(MiniTest.expect)
 
-M.expect.match = MiniTest.new_expectation(
-  'string matching',
-  function(str, pattern) return str:find(pattern) ~= nil end,
-  function(str, pattern) return string.format('Pattern: %s\nObserved string: %s', vim.inspect(pattern), str) end
-)
+M.expect.match = MiniTest.new_expectation("string matching", function(str, pattern)
+  return str:find(pattern) ~= nil
+end, function(str, pattern)
+  return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
+end)
 
-M.expect.no_match = MiniTest.new_expectation(
-  'no string matching',
-  function(str, pattern) return str:find(pattern) == nil end,
-  function(str, pattern) return string.format('Pattern: %s\nObserved string: %s', vim.inspect(pattern), str) end
-)
+M.expect.no_match = MiniTest.new_expectation("no string matching", function(str, pattern)
+  return str:find(pattern) == nil
+end, function(str, pattern)
+  return string.format("Pattern: %s\nObserved string: %s", vim.inspect(pattern), str)
+end)
 
 local function scrub_temp_paths(path)
   local temp_base = vim.fn.tempname():match("^(.*/nvim%.[^/]*/)")

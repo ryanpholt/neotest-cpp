@@ -34,8 +34,8 @@ for _, version in ipairs(gtest_versions) do
       end,
     },
     parametrize = {
-      {"pattern"},
-      {"resolve"},
+      { "pattern" },
+      { "resolve" },
     },
   })
 
