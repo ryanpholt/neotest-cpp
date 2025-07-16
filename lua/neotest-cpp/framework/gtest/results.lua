@@ -131,13 +131,6 @@ function M.results(spec, result)
       end
     end
   end
-  for _, test in ipairs(spec.context.non_existent_tests) do
-    local id = normalize_and_make_id(test.file, spec.cwd, test.suite, test.name)
-    results[id] = {
-      status = "skipped",
-      short = string.format("\27[1m%s.%s does not exist on executable\27[0m\n", test.suite, test.name),
-    }
-  end
   log.debug("GTest results:", results)
   return results
 end

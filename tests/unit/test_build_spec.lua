@@ -9,7 +9,13 @@ local T = MiniTest.new_set({
       child.restart({ "-u", "scripts/minimal_init.lua" })
       child.lua_func(function()
         _G._TEST = true
-        require("tests.helpers").setup_neotest({})
+        require("tests.helpers").setup_neotest({
+          executables = {
+            resolve = function(_)
+              return "/path/to/executable"
+            end
+          }
+        })
       end)
     end,
     post_case = function()
@@ -50,7 +56,6 @@ T["should create a valid run spec for a test"] = function()
     {
       command = { "/path/to/test_executable", "--gtest_filter=TestSuite.TestCase", "--gtest_output=json:/tmp/neotest-cpp-results" },
       context = {
-        non_existent_tests = {},
         results_path = "/tmp/neotest-cpp-results"
       }
     }
@@ -61,7 +66,6 @@ T["should create a valid run spec for a test"] = function()
     command = { "/path/to/test_executable", "--gtest_filter=TestSuite.TestCase", "--gtest_output=json:/tmp/neotest-cpp-results",
                 "--gtest_color=no", "--gtest_break_on_failure" },
     context = {
-      non_existent_tests = {},
       results_path = "/tmp/neotest-cpp-results"
     },
     strategy = {
@@ -115,7 +119,6 @@ T["should create a valid run spec for a namespace with multiple tests"] = functi
     {
       command = { "/path/to/test_executable", "--gtest_filter=TestSuite.TestCase1:TestSuite.TestCase2", "--gtest_output=json:/tmp/neotest-cpp-results" },
       context = {
-        non_existent_tests = {},
         results_path = "/tmp/neotest-cpp-results"
       }
     }
@@ -126,7 +129,6 @@ T["should create a valid run spec for a namespace with multiple tests"] = functi
     command = { "/path/to/test_executable", "--gtest_filter=TestSuite.TestCase1:TestSuite.TestCase2", "--gtest_output=json:/tmp/neotest-cpp-results",
                 "--gtest_color=no", "--gtest_break_on_failure" },
     context = {
-      non_existent_tests = {},
       results_path = "/tmp/neotest-cpp-results"
     },
     strategy = {
@@ -190,7 +192,6 @@ T["should create a valid run spec for a file with multiple tests"] = function()
     {
       command = { "/path/to/test_executable", "--gtest_filter=TestSuite.TestCase1:TestSuite.TestCase2", "--gtest_output=json:/tmp/neotest-cpp-results" },
       context = {
-        non_existent_tests = {},
         results_path = "/tmp/neotest-cpp-results"
       }
     }
@@ -201,7 +202,6 @@ T["should create a valid run spec for a file with multiple tests"] = function()
     command = { "/path/to/test_executable", "--gtest_filter=TestSuite.TestCase1:TestSuite.TestCase2", "--gtest_output=json:/tmp/neotest-cpp-results",
                 "--gtest_color=no", "--gtest_break_on_failure" },
     context = {
-      non_existent_tests = {},
       results_path = "/tmp/neotest-cpp-results"
     },
     strategy = {
@@ -255,7 +255,6 @@ T["should create a valid run spec for parameterized tests"] = function()
     {
       command = { "/path/to/test_executable", "--gtest_filter=ParameterizedTest/IntegrationTest.TestCase/0:ParameterizedTest/IntegrationTest.TestCase/1", "--gtest_output=json:/tmp/neotest-cpp-results" },
       context = {
-        non_existent_tests = {},
         results_path = "/tmp/neotest-cpp-results"
       }
     }
@@ -266,7 +265,6 @@ T["should create a valid run spec for parameterized tests"] = function()
     command = { "/path/to/test_executable", "--gtest_filter=ParameterizedTest/IntegrationTest.TestCase/0:ParameterizedTest/IntegrationTest.TestCase/1", "--gtest_output=json:/tmp/neotest-cpp-results",
                 "--gtest_color=no", "--gtest_break_on_failure" },
     context = {
-      non_existent_tests = {},
       results_path = "/tmp/neotest-cpp-results"
     },
     strategy = {
