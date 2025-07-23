@@ -170,12 +170,10 @@ T["should discover test with custom prefix"] = function()
   local input = [[
         #include <gtest/gtest.h>
 
-        // Not a valid prefix
         AB_TEST(MathTest, Multiplication) {
           EXPECT_EQ(2 * 2, 4);
         }
 
-        // Valid prefix
         RH_TEST(MathTest, Addition) {
           EXPECT_EQ(2 + 2, 4);
         }
@@ -185,14 +183,12 @@ T["should discover test with custom prefix"] = function()
           void SetUp() override {}
         };
 
-        // Valid prefix
         RH_TEST_F(StringTest, Length) {
           EXPECT_EQ(strlen("hello"), 5);
         }
 
         class MathParamTest : public ::testing::TestWithParam<int> {};
 
-        // Valid prefix
         XY_TEST_P(MathParamTest, IsEven) {
           int n = GetParam();
           EXPECT_EQ(n % 2, 0);
@@ -205,23 +201,15 @@ T["should discover test with custom prefix"] = function()
   local positions_str = discover_positions(input)
 
   local ids_to_find = {
+    "/tmp/test_discover_positions.cpp::MathTest::Multiplication",
     "/tmp/test_discover_positions.cpp::MathTest::Addition",
     "/tmp/test_discover_positions.cpp::StringTest::Length",
     "/tmp/test_discover_positions.cpp::*/MathParamTest::IsEven/*",
   }
 
-  local ids_to_not_find = {
-    "/tmp/test_discover_positions.cpp::MathTest::Multiplication",
-  }
-
-  -- Verify that ids_to_find are in positions_str
+  -- Verify that all prefixed tests are found
   for _, id in ipairs(ids_to_find) do
     MiniTest.expect.equality(string.match(positions_str, vim.pesc(id)), id)
-  end
-
-  -- Verify that ids_to_not_find are *not* in positions_str
-  for _, id in ipairs(ids_to_not_find) do
-    MiniTest.expect.no_equality(string.match(positions_str, vim.pesc(id)), id)
   end
 end
 

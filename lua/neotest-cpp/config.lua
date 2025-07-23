@@ -10,12 +10,8 @@ local M = {}
 --- @field env fun(executable: string): table<string, string>? Environment variables for the executable
 --- @field debug neotest-cpp.Config.Executable.Debug
 
---- @class neotest-cpp.Config.GTest
---- @field test_prefixes table<string> Custom prefixes for "TEST", "TEST_P" and "TEST_F". Needed to parse tests if your code has wrappers around the gtest macros.
-
 --- @class neotest-cpp.Config
 --- @field executables neotest-cpp.Config.Executable
---- @field gtest neotest-cpp.Config.GTest
 --- @field log_level vim.log.levels
 M.defaults = {
   executables = {
@@ -77,9 +73,6 @@ M.defaults = {
         return nil
       end,
     },
-  },
-  gtest = {
-    test_prefixes = {},
   },
   log_level = vim.log.levels.INFO,
 }

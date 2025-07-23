@@ -9,22 +9,10 @@ local TestFile = test_types.TestFile
 
 local M = {}
 
---- Build treesitter query with configurable test prefixes
+--- Build treesitter query to match any prefix ending with TEST, TEST_F, or TEST_P
 --- @return vim.treesitter.Query
 local function build_test_query()
-  local config = require("neotest-cpp.config")
-  local base_suffixes = { "TEST", "TEST_F", "TEST_P" }
-  local prefixes = config.get().gtest.test_prefixes or {}
-
-  local test_kinds = vim.tbl_extend("force", {}, base_suffixes)
-  for _, prefix in ipairs(prefixes) do
-    for _, suffix in ipairs(base_suffixes) do
-      table.insert(test_kinds, prefix .. suffix)
-    end
-  end
-
-  local query_string = string.format(
-    [[
+  local query_string = [[
   ((function_definition
     declarator: (
       function_declarator
@@ -40,16 +28,9 @@ local function build_test_query()
       )
       !type
   )
-  (#any-of? @test.kind %s))
+  (#match? @test.kind ".*TEST(_F|_P)?$"))
   @test.definition
-]],
-    vim
-      .iter(test_kinds)
-      :map(function(kind)
-        return '"' .. kind .. '"'
-      end)
-      :join(" ")
-  )
+]]
 
   return vim.treesitter.query.parse("cpp", query_string)
 end
