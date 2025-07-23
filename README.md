@@ -138,7 +138,6 @@ M.defaults = {
   end,
   log_level = vim.log.levels.INFO,
 }
-}
 ```
 
 The most important configuration is the `executables` field which tells the adapter how to find and run your test
