@@ -12,6 +12,7 @@ local M = {}
 
 --- @class neotest-cpp.Config
 --- @field executables neotest-cpp.Config.Executable
+--- @field is_test_file fun(file_path: string): boolean
 --- @field log_level vim.log.levels
 M.defaults = {
   executables = {
@@ -74,6 +75,12 @@ M.defaults = {
       end,
     },
   },
+  is_test_file = function(file_path)
+    return vim.endswith(file_path, ".cpp")
+      or vim.endswith(file_path, ".cxx")
+      or vim.endswith(file_path, ".cc")
+      or vim.endswith(file_path, ".c++")
+  end,
   log_level = vim.log.levels.INFO,
 }
 

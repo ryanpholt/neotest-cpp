@@ -36,4 +36,18 @@ T["should return false for non-C++ files"] = function()
   eq(is_test_file("/path/to/file.txt"), false)
 end
 
+T["should respect custom is_test_file configuration"] = function()
+  child.lua_func(function()
+    require("neotest-cpp").setup({
+      is_test_file = function(file_path)
+        return vim.endswith(file_path, "_test.cpp")
+      end,
+    })
+  end)
+
+  eq(is_test_file("/path/to/my_test.cpp"), true)
+  eq(is_test_file("/path/to/regular.cpp"), false)
+  eq(is_test_file("/path/to/test.cpp"), false)
+end
+
 return T

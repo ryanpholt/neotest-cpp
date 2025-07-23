@@ -32,10 +32,8 @@ end
 ---@param file_path string
 ---@return boolean
 M.is_test_file = function(file_path)
-  return vim.endswith(file_path, ".cpp")
-    or vim.endswith(file_path, ".cxx")
-    or vim.endswith(file_path, ".cc")
-    or vim.endswith(file_path, ".c++")
+  local config = require("neotest-cpp.config")
+  return config.get().is_test_file(file_path)
 end
 
 ---Given a file path, parse all the tests within it.
