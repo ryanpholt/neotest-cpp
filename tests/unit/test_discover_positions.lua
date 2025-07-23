@@ -213,4 +213,99 @@ T["should discover test with custom prefix"] = function()
   end
 end
 
+T["should discover test with additional arguments"] = function()
+  local input = [[
+      #include <gtest/gtest.h>
+
+      RH_TEST(MySuiteName, MyTestName, "") {
+        EXPECT_EQ(1, 1);
+      }
+
+      RH_TEST_F(MyFixture, MyFixtureTest, "description") {
+        EXPECT_TRUE(true);
+      }
+
+      class MyParamTest : public ::testing::TestWithParam<int> {};
+
+      RH_TEST_P(MyParamTest, MyParamTestName, "param description") {
+        int n = GetParam();
+        EXPECT_GT(n, 0);
+      }
+    ]]
+
+  local expected = [[
+      { {
+        id = "/tmp/test_discover_positions.cpp",
+        name = "test_discover_positions.cpp",
+        path = "/tmp/test_discover_positions.cpp",
+        range = { 0, 0, 0, 0 },
+        type = "file"
+      }, { {
+          id = "/tmp/test_discover_positions.cpp::MySuiteName",
+          name = "MySuiteName",
+          path = "/tmp/test_discover_positions.cpp",
+          range = { 2, 0, 2, 0 },
+          type = "namespace"
+        }, { {
+            id = "/tmp/test_discover_positions.cpp::MySuiteName::MyTestName",
+            name = "MyTestName",
+            path = "/tmp/test_discover_positions.cpp",
+            range = { 2, 6, 2, 42 },
+            suite = "MySuiteName",
+            type = "test"
+        } } }, { {
+          id = "/tmp/test_discover_positions.cpp::MyFixture",
+          name = "MyFixture",
+          path = "/tmp/test_discover_positions.cpp",
+          range = { 6, 0, 6, 0 },
+          type = "namespace"
+        }, { {
+            id = "/tmp/test_discover_positions.cpp::MyFixture::MyFixtureTest",
+            name = "MyFixtureTest",
+            path = "/tmp/test_discover_positions.cpp",
+            range = { 6, 6, 6, 56 },
+            suite = "MyFixture",
+            type = "test"
+        } } }, { {
+          id = "/tmp/test_discover_positions.cpp::*/MyParamTest",
+          name = "*/MyParamTest",
+          path = "/tmp/test_discover_positions.cpp",
+          range = { 12, 0, 12, 0 },
+          type = "namespace"
+        }, { {
+            id = "/tmp/test_discover_positions.cpp::*/MyParamTest::MyParamTestName/*",
+            name = "MyParamTestName/*",
+            path = "/tmp/test_discover_positions.cpp",
+            range = { 12, 6, 12, 66 },
+            suite = "*/MyParamTest",
+            type = "test"
+        } } } }
+    ]]
+
+  helpers.equality_sanitized(discover_positions(input), expected)
+end
+
+T["should discover test with comments in arguments"] = function()
+  local input = [[
+      #include <gtest/gtest.h>
+
+      RH_TEST(
+        // Comment before suite name
+        MySuiteName,
+        // Comment before test name
+        MyTestName,
+        // Comment before additional argument
+        ""
+      ) {
+        EXPECT_EQ(1, 1);
+      }
+    ]]
+
+  local positions_str = discover_positions(input)
+  local expected_id = "/tmp/test_discover_positions.cpp::MySuiteName::MyTestName"
+
+  -- Verify that the test with comments is found
+  MiniTest.expect.equality(string.match(positions_str, vim.pesc(expected_id)), expected_id)
+end
+
 return T

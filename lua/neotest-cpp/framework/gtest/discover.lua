@@ -10,6 +10,9 @@ local TestFile = test_types.TestFile
 local M = {}
 
 --- Build treesitter query to match any prefix ending with TEST, TEST_F, or TEST_P
+--- The query is not very strict as it allows custom macros that wrap the typical
+--- gtest macros. For example, this query should match
+---   (.*)TEST_(_F|P)?\(MySuite, MyTest(,.*)\)
 --- @return vim.treesitter.Query
 local function build_test_query()
   local query_string = [[
@@ -27,6 +30,19 @@ local function build_test_query()
         )
       )
       !type
+  )
+  (#match? @test.kind ".*TEST(_F|_P)?$"))
+  @test.definition
+
+  ((call_expression
+    function: (identifier) @test.kind
+    arguments: (argument_list
+      . (comment)*
+      . (identifier) @suite.name
+      . (comment)*
+      . (identifier) @test.name
+      . (_)*
+    )
   )
   (#match? @test.kind ".*TEST(_F|_P)?$"))
   @test.definition
