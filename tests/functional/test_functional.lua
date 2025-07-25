@@ -37,11 +37,12 @@ for _, version in ipairs(gtest_versions) do
       { "pattern" },
       { "resolve" },
     },
+    n_retry = 5,
   })
 
-  T[version]["status"] = function(pattern_or_resolve)
+  T[version]["TEST - basic tests"] = function(pattern_or_resolve)
     helpers.setup_neotest(child, pattern_or_resolve)
-    local test_file = child.fs.joinpath(test_project_dir, "test", "test_mylib.cpp")
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_basic.cpp")
 
     local status = helpers.run_and_get_status(child, test_file)
 
@@ -49,19 +50,19 @@ for _, version in ipairs(gtest_versions) do
       status,
       [[
   {
-    failed = 4,
-    passed = 4,
+    failed = 2,
+    passed = 2,
     running = 0,
-    skipped = 2,
-    total = 10
+    skipped = 0,
+    total = 4
   }
       ]]
     )
   end
 
-  T[version]["diagnostics"] = function(pattern_or_resolve)
+  T[version]["TEST - basic tests diagnostics"] = function(pattern_or_resolve)
     helpers.setup_neotest(child, pattern_or_resolve)
-    local test_file = child.fs.joinpath(test_project_dir, "test", "test_mylib.cpp")
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_basic.cpp")
 
     local diagnostics = helpers.run_and_get_diagnostics(child, test_file)
 
@@ -96,18 +97,108 @@ for _, version in ipairs(gtest_versions) do
       lnum = 15,
       message = "Expected equality of these values:\n  add(-1, 1)\n    Which is: 0\n  4",
       source = "neotest"
-    }, {
+    } }
+  ]]
+    )
+  end
+
+  T[version]["TEST - basic tests output panel"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_basic.cpp")
+
+    local output = helpers.run_and_get_output_panel_contents(child, test_file)
+
+    helpers.expect.match(output, "%[       OK %] MyLibTest%.AddFunction")
+    helpers.expect.match(output, "%[  FAILED  %] MyLibTest%.AddFunction2")
+    helpers.expect.match(output, "%[  FAILED  %] MyLibTest%.AddFunction3")
+    helpers.expect.match(output, "%[       OK %] MyLibTest%.AddFunction4")
+  end
+
+  T[version]["TEST_F - fixture tests"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_fixture.cpp")
+
+    local status = helpers.run_and_get_status(child, test_file)
+
+    helpers.equality_sanitized(
+      status,
+      [[
+  {
+    failed = 1,
+    passed = 1,
+    running = 0,
+    skipped = 0,
+    total = 2
+  }
+      ]]
+    )
+  end
+
+  T[version]["TEST_F - fixture tests diagnostics"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_fixture.cpp")
+
+    local diagnostics = helpers.run_and_get_diagnostics(child, test_file)
+
+    helpers.equality_sanitized(
+      diagnostics,
+      [[
+  { {
       col = 2,
       end_col = 2,
-      end_lnum = 48,
-      lnum = 48,
+      end_lnum = 19,
+      lnum = 19,
       message = "Expected equality of these values:\n  value\n    Which is: 42\n  0",
       source = "neotest"
-    }, {
+    } }
+  ]]
+    )
+  end
+
+  T[version]["TEST_F - fixture tests output panel"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_fixture.cpp")
+
+    local output = helpers.run_and_get_output_panel_contents(child, test_file)
+
+    helpers.expect.match(output, "%[       OK %] MyFixture%.ValueEqualsFortyTwo")
+    helpers.expect.match(output, "%[  FAILED  %] MyFixture%.ValueEqualsZero")
+  end
+
+  T[version]["TEST_P - parameterized tests"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_parameterized.cpp")
+
+    local status = helpers.run_and_get_status(child, test_file)
+
+    helpers.equality_sanitized(
+      status,
+      [[
+  {
+    failed = 1,
+    passed = 1,
+    running = 0,
+    skipped = 0,
+    total = 2
+  }
+      ]]
+    )
+  end
+
+  T[version]["TEST_P - parameterized tests diagnostics"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_parameterized.cpp")
+
+    local diagnostics = helpers.run_and_get_diagnostics(child, test_file)
+
+    helpers.equality_sanitized(
+      diagnostics,
+      [[
+  { {
       col = 2,
       end_col = 2,
-      end_lnum = 65,
-      lnum = 65,
+      end_lnum = 14,
+      lnum = 14,
       message = "Expected equality of these values:\n  n % 2\n    Which is: 0\n  1",
       source = "neotest"
     } }
@@ -115,22 +206,77 @@ for _, version in ipairs(gtest_versions) do
     )
   end
 
-  T[version]["output panel"] = function(pattern_or_resolve)
+  T[version]["TEST_P - parameterized tests output panel"] = function(pattern_or_resolve)
     helpers.setup_neotest(child, pattern_or_resolve)
-    local test_file = child.fs.joinpath(test_project_dir, "test", "test_mylib.cpp")
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_parameterized.cpp")
 
     local output = helpers.run_and_get_output_panel_contents(child, test_file)
 
-    helpers.expect.match(output, "%[ DISABLED %] MyLibTest.DISABLED_AddFunction5")
-    helpers.expect.match(output, "%[  SKIPPED %] MyLibTest.AddFunction6")
-    helpers.expect.match(output, "%[==========%] 13 tests from 3 test suites ran.")
-    helpers.expect.match(output, "%[  PASSED  %] 6 tests.")
-    helpers.expect.match(output, "%[  FAILED  %] MyLibTest.AddFunction2")
-    helpers.expect.match(output, "%[  FAILED  %] MyLibTest.AddFunction3")
-    helpers.expect.match(output, "%[  FAILED  %] MyFixture.ValueEqualsZero")
-    helpers.expect.match(output, "%[  FAILED  %] EvenNumbersTests/MyParameterizedTest.CheckEvenNumbers2/0")
-    helpers.expect.match(output, "%[  FAILED  %] EvenNumbersTests/MyParameterizedTest.CheckEvenNumbers2/1")
-    helpers.expect.match(output, "%[  FAILED  %] EvenNumbersTests/MyParameterizedTest.CheckEvenNumbers2/2")
+    helpers.expect.match(output, "%[       OK %] EvenNumbersTests/MyParameterizedTest%.CheckEvenNumbers/0")
+    helpers.expect.match(output, "%[       OK %] EvenNumbersTests/MyParameterizedTest%.CheckEvenNumbers/1")
+    helpers.expect.match(output, "%[       OK %] EvenNumbersTests/MyParameterizedTest%.CheckEvenNumbers/2")
+    helpers.expect.match(output, "%[  FAILED  %] EvenNumbersTests/MyParameterizedTest%.CheckEvenNumbers2/0")
+    helpers.expect.match(output, "%[  FAILED  %] EvenNumbersTests/MyParameterizedTest%.CheckEvenNumbers2/1")
+    helpers.expect.match(output, "%[  FAILED  %] EvenNumbersTests/MyParameterizedTest%.CheckEvenNumbers2/2")
+  end
+
+  T[version]["DISABLED tests"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_disabled.cpp")
+
+    local status = helpers.run_and_get_status(child, test_file)
+
+    helpers.equality_sanitized(
+      status,
+      [[
+  {
+    failed = 0,
+    passed = 0,
+    running = 0,
+    skipped = 1,
+    total = 1
+  }
+      ]]
+    )
+  end
+
+  T[version]["DISABLED tests output panel"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_disabled.cpp")
+
+    local output = helpers.run_and_get_output_panel_contents(child, test_file)
+
+    helpers.expect.match(output, "0 tests from 0 test suites ran")
+    helpers.expect.match(output, "YOU HAVE 1 DISABLED TEST")
+  end
+
+  T[version]["SKIPPED tests"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_skipped.cpp")
+
+    local status = helpers.run_and_get_status(child, test_file)
+
+    helpers.equality_sanitized(
+      status,
+      [[
+  {
+    failed = 0,
+    passed = 0,
+    running = 0,
+    skipped = 1,
+    total = 1
+  }
+      ]]
+    )
+  end
+
+  T[version]["SKIPPED tests output panel"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_skipped.cpp")
+
+    local output = helpers.run_and_get_output_panel_contents(child, test_file)
+
+    helpers.expect.match(output, "%[  SKIPPED %] MyLibTest%.AddFunction6")
   end
 end
 

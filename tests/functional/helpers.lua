@@ -7,9 +7,12 @@ function M.setup_neotest(child, pattern_or_resolve_)
     if pattern_or_resolve == "pattern" then
       patterns = { "tests/functional/cpp/build/**" }
     else
-      resolve = function(_)
-        local results = vim.fn.glob("tests/functional/cpp/build/**/tests", false, true)
-        assert(#results == 1)
+      resolve = function(test_file)
+        local filename = vim.fn.fnamemodify(test_file, ":t")
+        local exe_name = string.gsub(filename, "%.cpp", "")
+        assert(exe_name, "No executable mapping found for test file: " .. filename)
+        local results = vim.fn.glob("tests/functional/cpp/build/**/" .. exe_name, false, true)
+        assert(#results == 1, "Expected exactly 1 executable for " .. exe_name .. ", found " .. #results)
         return results[1]
       end
     end

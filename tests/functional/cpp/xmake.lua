@@ -13,11 +13,16 @@ add_includedirs("include")
 add_files("src/*.cpp")
 set_languages("c++20")
 
-target("tests")
-set_kind("binary")
-add_includedirs("include")
-add_files("test/*.cpp")
-add_deps("your_library")
-set_languages("c++20")
-add_packages("gtest")
-add_tests("default")
+local tests = { "test_basic", "test_fixture", "test_parameterized",
+                "test_disabled", "test_skipped" }
+
+for _, test in ipairs(tests) do
+  target(test)
+  set_kind("binary")
+  add_includedirs("include")
+  add_files("test/" .. test .. ".cpp")
+  add_deps("your_library")
+  set_languages("c++20")
+  add_packages("gtest")
+  add_tests("default")
+end
