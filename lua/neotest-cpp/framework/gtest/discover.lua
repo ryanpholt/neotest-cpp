@@ -140,15 +140,20 @@ local function run_gtest_list(executable)
       end
     )
   end)
+  local error_msg = "Failed to list tests from executable"
   if not ok then
-    return nil, string.format("Failed to list tests from executable '%s': %s", executable.path, res)
+    return nil, string.format("%s '%s': %s", error_msg, executable.path, res)
   end
   res = future.wait()
   if res.code ~= 0 then
     return nil,
-      string.format("Failed to list tests from executable '%s': %s (code: %d)", executable, res.stderr, res.code)
+      string.format("%s '%s': %s (code: %d)", error_msg, executable, res.stderr, res.code)
   end
-  local json = require("neotest.lib").files.read(test_list_file)
+  local lib = require("neotest.lib")
+  if not lib.files.exists(test_list_file) then
+    return nil, string.format("%s '%s'", error_msg, executable.path)
+  end
+  local json = lib.files.read(test_list_file)
   return vim.json.decode(json)
 end
 
