@@ -278,6 +278,27 @@ for _, version in ipairs(gtest_versions) do
 
     helpers.expect.match(output, "%[  SKIPPED %] MyLibTest%.AddFunction6")
   end
+
+  T[version]["exception tests diagnostics"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_throw.cpp")
+
+    local diagnostics = helpers.run_and_get_diagnostics(child, test_file)
+
+    helpers.equality_sanitized(
+      diagnostics,
+      [[
+        { {
+          col = 0,
+          end_col = 0,
+          end_lnum = 3,
+          lnum = 3,
+          message = 'C++ exception with description "std::exception" thrown in the test body.',
+          source = "neotest"
+        } }
+    ]]
+    )
+  end
 end
 
 return T

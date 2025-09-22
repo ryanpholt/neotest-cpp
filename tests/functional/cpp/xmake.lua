@@ -14,7 +14,7 @@ add_files("src/*.cpp")
 set_languages("c++20")
 
 local tests = { "test_basic", "test_fixture", "test_parameterized",
-                "test_disabled", "test_skipped" }
+                "test_disabled", "test_skipped", "test_throw" }
 
 for _, test in ipairs(tests) do
   target(test)

@@ -8,14 +8,17 @@ local M = {}
 --- Extract error message and line number from test output
 --- @param message string Test failure message
 --- @return string Error message
---- @return number Line number
+--- @return number? Line number
 local function extract_error_msg_and_line(message)
+  -- Normally the failure looks like this:
+  --   dir/file.cpp:20: Failure
+  -- but it can also be:
+  --   unknown file: Failure
+  -- when the test throws some non-gtest exception
   local newline = message:find("\n")
   assert(newline)
   local linenum = message:sub(1, newline - 1):match(".*:(%d+)$")
-  assert(linenum)
-  local number = tonumber(linenum)
-  assert(number)
+  local number = linenum and tonumber(linenum) - 1 or nil
   return message:sub(newline + 1), number
 end
 
@@ -28,7 +31,7 @@ local function extract_errors(gtest_failures)
       local msg, line = extract_error_msg_and_line(failure.failure)
       return {
         message = msg,
-        line = line - 1,
+        line = line,
       }
     end)
     :totable()

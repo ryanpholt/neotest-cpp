@@ -241,4 +241,50 @@ T["failed parameterized"] = function()
   helpers.equality_sanitized(get_results(mock_gtest_results), expected)
 end
 
+T["exception"] = function()
+  local mock_gtest_results = {
+    testsuites = {
+      {
+        name = "MathTest",
+        testsuite = {
+          {
+            name = "AddFunction3",
+            file = "test/test_mylib.cpp",
+            line = 14,
+            status = "RUN",
+            result = "COMPLETED",
+            timestamp = "2025-07-16T09:41:58Z",
+            time = "0s",
+            classname = "MyLibTest",
+            failures = {
+              {
+                failure = 'unknown file\nC++ exception with description "std::exception" thrown in the test body.\n',
+                type = "",
+              },
+            },
+          },
+        },
+      },
+    },
+  }
+
+  local expected = string.format(
+    [[
+      {
+    ["%s/test/test_mylib.cpp::MathTest::AddFunction3"] = {
+      errors = { {
+          message = 'C++ exception with description "std::exception" thrown in the test body.\n'
+        } },
+      output = "test output",
+      short = '\27[1mMathTest.AddFunction3 failed\27[0m\n\nC++ exception with description "std::exception" thrown in the test body.\n',
+      status = "failed"
+    }
+  }
+  ]],
+    vim.fn.getcwd()
+  )
+
+  helpers.equality_sanitized(get_results(mock_gtest_results), expected)
+end
+
 return T
