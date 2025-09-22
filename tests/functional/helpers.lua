@@ -107,6 +107,7 @@ function M.run_and_get_diagnostics(child, test_file)
         diag.namespace = nil
         diag.severity = nil
         diag.bufnr = nil
+        diag._extmark_id = nil
         -- Normalize message by trimming trailing whitespace/newlines
         if diag.message then
           diag.message = vim.trim(diag.message)
