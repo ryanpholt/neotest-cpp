@@ -279,6 +279,26 @@ for _, version in ipairs(gtest_versions) do
     helpers.expect.match(output, "%[  SKIPPED %] MyLibTest%.AddFunction6")
   end
 
+  T[version]["abort tests"] = function(pattern_or_resolve)
+    helpers.setup_neotest(child, pattern_or_resolve)
+    local test_file = child.fs.joinpath(test_project_dir, "test", "test_abort.cpp")
+
+    local status = helpers.run_and_get_status(child, test_file)
+
+    helpers.equality_sanitized(
+      status,
+      [[
+        {
+          failed = 3,
+          passed = 0,
+          running = 0,
+          skipped = 0,
+          total = 3
+        }
+      ]]
+    )
+  end
+
   T[version]["exception tests diagnostics"] = function(pattern_or_resolve)
     helpers.setup_neotest(child, pattern_or_resolve)
     local test_file = child.fs.joinpath(test_project_dir, "test", "test_throw.cpp")
